@@ -48,7 +48,10 @@ class Match:
         self.home_squad = Home_squad
         self.visitor_squad = Visitor_squad
 
-        self.score_expectancy = self.get_score_expectancy()
+        self.home_score_expectancy = self.get_score_expectancy()[0]
+        self.visitor_score_expectancy = self.get_score_expectancy()[1]
+
+        self.score_expectancy = self.home_score_expectancy + self.visitor_score_expectancy
 
         self.fixed_score_num_probs = []
         for i in range(0, 7):
@@ -59,10 +62,10 @@ class Match:
         self.unders = []
 
         for i in range(0, len(self.fixed_score_num_probs)):
-            self.unders.append(sum(self.fixed_score_num_probs[1:i+1] * 100, self.fixed_score_num_probs[0] * 100))
+            self.unders.append(sum(self.fixed_score_num_probs[1:i + 1] * 100, self.fixed_score_num_probs[0] * 100))
         for i in range(0, len(self.unders)):
-            self.overs.append(100-self.unders[i])
-        self.print_analysis()
+            self.overs.append(100 - self.unders[i])
+        # self.print_analysis()
 
     def get_score_expectancy(self):
         home_score_expectancy = self.home_squad.avg_scored_over_90_mins
@@ -73,7 +76,14 @@ class Match:
         home_correlated_score = home_score_expectancy - 0.5 * (visitor_suff_expectancy - home_score_expectancy)
         visitor_correlated_score = visitor_score_expectancy - 0.5 * (home_suff_expectancy - visitor_score_expectancy)
 
-        return home_correlated_score + visitor_correlated_score
+        return home_correlated_score, visitor_correlated_score
+
+    def get_sub_probs_given(self, goals):
+        print("\n\n{} goals : {} %\n".format(goals, self.fixed_score_num_probs[goals] * 100))
+        # for i in range(0, goals+1):
+        # print("({}-{}) {} - {} = {} %".format(self.home_squad.name,self.visitor_squad.name, i, goals-i, Poisson.Bin_distrib(self.home_score_expectancy/self.score_expectancy, goals).prob_calc(i) * 100))
+        for i in range(0, goals+1):
+            print("Absolute prob ({}-{}) {} - {} = {} %".format(self.home_squad.name,self.visitor_squad.name, i, goals-i, self.fixed_score_num_probs[goals]*Poisson.Bin_distrib(self.home_score_expectancy/self.score_expectancy, goals).prob_calc(i) * 100))
 
     def print_analysis(self):
         print(
@@ -86,7 +96,10 @@ class Match:
                 self.visitor_squad.name, self.visitor_squad.avg_scored, self.visitor_squad.var_scored,
                 self.visitor_squad.avg_suff, self.visitor_squad.var_suff, self.visitor_squad.avg_scored_over_90_mins,
                 self.visitor_squad.avg_suff_over_90_mins))
-        print("Goal Expectancy: {}\n".format(self.score_expectancy))
+        print(
+            "Goal Expectancy: {}\nHome goal expectancy: {}\nVisitor goal expectancy: {}\n".format(self.score_expectancy,
+                                                                                                  self.home_score_expectancy,
+                                                                                                  self.visitor_score_expectancy))
 
         for i in range(0, len(self.fixed_score_num_probs)):
             print("{} goal: {} %".format(i, self.fixed_score_num_probs[i] * 100))
@@ -98,4 +111,3 @@ class Match:
         print("\nOVER:")
         for i in range(0, len(self.overs)):
             print("{}.5: {} %".format(i, self.overs[i]))
-

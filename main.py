@@ -23,5 +23,7 @@ def match_analysis(team_1, team_2):
     return Squad_n_Matches.Match(home_team, visitor_team)
 
 
-a = match_analysis("INTER", "CAGLIARI")
+a = match_analysis("ATALANTA", "VERONA")
+for i in range(0,7):
+    a.get_sub_probs_given(i)
 
