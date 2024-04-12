@@ -2,7 +2,7 @@ import math
 
 import Poisson
 
-
+GOAL_NUM = 11
 def get_avg_var(list_num):
     n = len(list_num)
 
@@ -19,7 +19,7 @@ def get_avg_var(list_num):
         somma_quad_diff = sum((x - avg) ** 2 for x in list_num)
         var = somma_quad_diff / n
 
-    return avg, var
+    return avg, math.sqrt(var)
 
 
 def func1(u, p):
@@ -54,7 +54,7 @@ class Match:
         self.score_expectancy = self.home_score_expectancy + self.visitor_score_expectancy
 
         self.fixed_score_num_probs = []
-        for i in range(0, 7):
+        for i in range(0, GOAL_NUM):
             vals = Poisson.Poisson_distrib(self.score_expectancy).prob_calc(i)
             self.fixed_score_num_probs.append(vals[0])
 
@@ -85,6 +85,20 @@ class Match:
         for i in range(0, goals+1):
             print("Absolute prob ({}-{}) {} - {} = {} %".format(self.home_squad.name,self.visitor_squad.name, i, goals-i, self.fixed_score_num_probs[goals]*Poisson.Bin_distrib(self.home_score_expectancy/self.score_expectancy, goals).prob_calc(i) * 100))
 
+    def get_result_predictions(self):
+        temp_1 = 0
+        temp_x = 0
+        temp_2 = 0
+        for goals in range(0,GOAL_NUM):
+            for i in range(0,goals+1):
+                if i > goals-i:
+                    temp_1 += self.fixed_score_num_probs[goals]*Poisson.Bin_distrib(self.home_score_expectancy/self.score_expectancy, goals).prob_calc(i)
+                elif i < goals - i:
+                    temp_2 += self.fixed_score_num_probs[goals]*Poisson.Bin_distrib(self.home_score_expectancy/self.score_expectancy, goals).prob_calc(i)
+                else:
+                    temp_x += self.fixed_score_num_probs[goals]*Poisson.Bin_distrib(self.home_score_expectancy/self.score_expectancy, goals).prob_calc(i)
+        print("\nOUTCOMES:\nexact result:\n1: {} %\nX: {} %\n2: {} %\nPrecision:{} %".format(temp_1*100, temp_x*100, temp_2*100, (1-(temp_1+temp_2+temp_x))*100))
+        print("\nDouble chance:\n1X: {} %\nX2: {} %\n12: {} %".format((temp_1+temp_x)*100, (temp_x+temp_2)*100, (temp_1+temp_2)*100))
     def print_analysis(self):
         print(
             "LOCALI:\nNome: {}\nMedia gol fatti: {}\nVarianza gol fatti: {}\nMedia gol subiti: {}\nVarianza gol subiti: {}\nMedia gol fatti ai minuti: {}\nMedia gol subiti ai minuti: {}\n".format(
