@@ -24,8 +24,6 @@ def match_analysis(team_1, team_2):
 
 
 a = match_analysis("ATALANTA", "VERONA")
-a.print_analysis()
-# for i in range(0,Squad_n_Matches.GOAL_NUM):
-# a.get_sub_probs_given(i)
+
 a.get_result_predictions()
 

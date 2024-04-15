@@ -17,7 +17,7 @@ class Bin_distrib:
         self.extractions = extractions
 
     def prob_calc(self, value):
-        temp = coefficiente_binomiale(self.extractions, value) * ((self.prob) ** value) * (
+        temp = coefficiente_binomiale(self.extractions, value) * (self.prob ** value) * (
                     (1 - self.prob) ** (self.extractions - value))
         return temp
 
