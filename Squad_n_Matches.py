@@ -2,7 +2,7 @@ import math
 
 import Poisson
 
-GOAL_NUM = 8
+GOAL_NUM = 10
 
 
 def get_avg_var(list_num):
@@ -61,8 +61,9 @@ class Match:
         self.home_squad = Home_squad
         self.visitor_squad = Visitor_squad
 
-        self.home_score_expectancy = self.get_score_expectancy()[0]
-        self.visitor_score_expectancy = self.get_score_expectancy()[1]
+        self.temp = self.get_score_expectancy()
+        self.home_score_expectancy = self.temp[0]
+        self.visitor_score_expectancy = self.temp[1]
 
         self.score_expectancy = self.home_score_expectancy + self.visitor_score_expectancy
 
@@ -83,6 +84,7 @@ class Match:
         for i in range(0, len(self.unders)):
             self.overs.append(100 - self.unders[i])
         self.print_analysis()
+        self.get_result_predictions()
 
     def get_score_expectancy(self):
         home_score_expectancy = self.home_squad.avg_scored_over_90_mins
@@ -90,8 +92,13 @@ class Match:
         visitor_score_expectancy = self.visitor_squad.avg_scored_over_90_mins
         visitor_suff_expectancy = self.visitor_squad.avg_suff_over_90_mins
 
-        home_correlated_score = home_score_expectancy - 0.5 * (visitor_suff_expectancy - home_score_expectancy)
-        visitor_correlated_score = visitor_score_expectancy - 0.5 * (home_suff_expectancy - visitor_score_expectancy)
+        alfa = 0.5 * (home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy) + visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy))
+        print("Alfa_tuner = {}".format(alfa))
+
+        home_correlated_score = home_score_expectancy + alfa * (visitor_suff_expectancy - home_score_expectancy)
+        visitor_correlated_score = visitor_score_expectancy + alfa * (home_suff_expectancy - visitor_score_expectancy)
+
+        # print("Coefficient threshold for home: {}\nCoefficient threshold for visitors: {}".format(home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy), visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy)))
 
         return home_correlated_score, visitor_correlated_score
 
