@@ -23,6 +23,6 @@ def match_analysis(team_1, team_2):
     return Squad_n_Matches.Match(home_team, visitor_team)
 
 
-a = match_analysis("FIORENTINA", "GENOA")
+a = match_analysis("INTER", "CAGLIARI")
 
 

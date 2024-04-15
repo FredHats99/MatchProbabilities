@@ -67,7 +67,7 @@ class Match:
 
         self.score_expectancy = self.home_score_expectancy + self.visitor_score_expectancy
 
-        self.SE_confidence = self.get_confidence_interval()
+        # self.SE_confidence = self.get_confidence_interval()
 
         self.fixed_score_num_probs = []
         for i in range(0, GOAL_NUM):
@@ -92,13 +92,13 @@ class Match:
         visitor_score_expectancy = self.visitor_squad.avg_scored_over_90_mins
         visitor_suff_expectancy = self.visitor_squad.avg_suff_over_90_mins
 
-        alfa = 0.5 * (home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy) + visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy))
+        alfa = 0.1 * (home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy) + visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy))
         print("Alfa_tuner = {}".format(alfa))
 
         home_correlated_score = home_score_expectancy + alfa * (visitor_suff_expectancy - home_score_expectancy)
         visitor_correlated_score = visitor_score_expectancy + alfa * (home_suff_expectancy - visitor_score_expectancy)
 
-        # print("Coefficient threshold for home: {}\nCoefficient threshold for visitors: {}".format(home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy), visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy)))
+        print("Coefficient threshold for home: {}\nCoefficient threshold for visitors: {}".format(home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy), visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy)))
 
         return home_correlated_score, visitor_correlated_score
 
@@ -150,10 +150,10 @@ class Match:
                 self.visitor_squad.std_scored_over_90_mins,
                 self.visitor_squad.std_suff_over_90_mins))
         print(
-            "Goal Expectancy: {}\nHome goal expectancy: {}\nVisitor goal expectancy: {}\nConfidence Interval:[{},{}]\n".format(
+            "Goal Expectancy: {}\nHome goal expectancy: {}\nVisitor goal expectancy: {}\nConfidence Interval:[,]\n".format(
                 self.score_expectancy,
                 self.home_score_expectancy,
-                self.visitor_score_expectancy, self.SE_confidence[0], self.SE_confidence[1], ))
+                self.visitor_score_expectancy))
 
         for i in range(0, len(self.fixed_score_num_probs)):
             print("{} goal: {} %".format(i, self.fixed_score_num_probs[i] * 100))
