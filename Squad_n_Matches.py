@@ -2,7 +2,7 @@ import math
 
 import Poisson
 
-GOAL_NUM = 10
+GOAL_NUM = 8
 
 
 def get_avg_var(list_num):
@@ -92,13 +92,19 @@ class Match:
         visitor_score_expectancy = self.visitor_squad.avg_scored_over_90_mins
         visitor_suff_expectancy = self.visitor_squad.avg_suff_over_90_mins
 
-        alfa = 0.1 * (home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy) + visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy))
+        # alfa = -0.1 * (home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy) + visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy))
+        # alfa = -0.1*(home_score_expectancy + visitor_score_expectancy)/(home_suff_expectancy+visitor_suff_expectancy-home_score_expectancy-visitor_score_expectancy)
+        alfa = 0.5*min(math.fabs(home_score_expectancy/math.log(visitor_suff_expectancy, math.e)), math.fabs(visitor_score_expectancy/math.log(home_suff_expectancy, math.e)))
         print("Alfa_tuner = {}".format(alfa))
 
-        home_correlated_score = home_score_expectancy + alfa * (visitor_suff_expectancy - home_score_expectancy)
-        visitor_correlated_score = visitor_score_expectancy + alfa * (home_suff_expectancy - visitor_score_expectancy)
+        # home_correlated_score = home_score_expectancy + alfa * (visitor_suff_expectancy - home_score_expectancy)
+        home_correlated_score = home_score_expectancy + alfa*math.log(visitor_suff_expectancy, math.e)
+        # visitor_correlated_score = visitor_score_expectancy + alfa * (home_suff_expectancy - visitor_score_expectancy)
+        visitor_correlated_score = visitor_score_expectancy + alfa*math.log(home_suff_expectancy, math.e)
 
-        print("Coefficient threshold for home: {}\nCoefficient threshold for visitors: {}".format(home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy), visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy)))
+        # print("Coefficient threshold for home: {}\nCoefficient threshold for visitors: {}".format(home_score_expectancy/(home_score_expectancy-visitor_suff_expectancy), visitor_score_expectancy/(visitor_score_expectancy-home_suff_expectancy)))
+        print("Coefficient threshold for home: {}\nCoefficient threshold for visitors: {}".format(math.fabs(home_score_expectancy/math.log(visitor_suff_expectancy, math.e)), math.fabs(visitor_score_expectancy/math.log(home_suff_expectancy, math.e))))
+
 
         return home_correlated_score, visitor_correlated_score
 
@@ -169,8 +175,8 @@ class Match:
         print("\n MULTIGOL:")
         for i in range(len(self.multig[1])):
             print("({}): {} %".format(self.multig[1][i], self.multig[0][i] * 100))
-        for i in range(0, GOAL_NUM):
-            self.get_sub_probs_given(i)
+        # for i in range(0, GOAL_NUM):
+        # self.get_sub_probs_given(i)
 
         print("\nGOL/NOGOL:")
         print("GOL: {}\nNOGOL: {}".format(100-self.nogoal, self.nogoal))
